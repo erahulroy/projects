@@ -35,7 +35,7 @@ def get_weather(city):
     except Exception as err:
         print(f"Error: {err}")
 
-city = input("Enter city name (e.g., London, New York, Tokyo): ").strip()
+city = input("Enter city name: ").strip()
 if city:
     get_weather(city)
 else:
