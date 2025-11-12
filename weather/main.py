@@ -11,9 +11,9 @@ def get_weather(city):
     }
     
     try:
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()
-        weather_data = response.json()
+        fetched_data = requests.get(base_url, params=params)
+        fetched_data.raise_for_status()
+        weather_data = fetched_data.json()
         
         city_name = weather_data['name']
         temperature = weather_data['main']['temp']
@@ -24,9 +24,9 @@ def get_weather(city):
         print(f"Condition: {condition}")
         
     except requests.exceptions.HTTPError as http_err:
-        if response.status_code == 404:
+        if fetched_data.status_code == 404:
             print(f"Error: City '{city}' not found.")
-        elif response.status_code == 401:
+        elif fetched_data.status_code == 401:
             print("Error: Invalid API key.")
         else:
             print(f"HTTP error: {http_err}")
@@ -35,7 +35,7 @@ def get_weather(city):
     except Exception as err:
         print(f"Error: {err}")
 
-city = input("Enter city name: ").strip()
+city = input("Enter city name (e.g., London, New York, Tokyo): ").strip()
 if city:
     get_weather(city)
 else:
