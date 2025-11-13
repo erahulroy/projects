@@ -35,3 +35,13 @@ AFTER UPDATE ON employees
 FOR EACH ROW
 WHEN (OLD.salary IS DISTINCT FROM NEW.salary)
 EXECUTE FUNCTION log_salary_change();
+
+-- Insert sample employees
+INSERT INTO employees (name, salary) VALUES
+    ('John Doe', 50000.00),
+    ('Jane Smith', 65000.00),
+
+-- Update single employee by ID
+UPDATE employees 
+SET salary = 60000.00 
+WHERE employee_id = 1;
