@@ -12,23 +12,82 @@ def get_weather(city):
     }
 
     try:
-        # fetched_data stores http response object like:
-        #   fetched_data.status_code: 200 if data found, 404 if no city found, 401 if invalid API key
-        #   fetched_data.text: received data in text formate (here we receive in JSON (plain text formated like dictionaries) formate)
-        # if there is no internet connection then it raises requests.exceptions.ConnectionError
         fetched_data = requests.get(base_url, params=params)
-        # .raise_for_status() method is used to check http status code. if code is 200-299, successful fetch and does nothing. if code is 400-499, means client error and raises requests.exceptions.HTTPError. if code is 500-599, means server error and raises requests.exceptions.HTTPError.
         fetched_data.raise_for_status()
-        # .json() method used to convert received JSON to python dictionaries
         weather_data = fetched_data.json()
 
+        # Extract all available weather information
         city_name = weather_data['name']
-        temperature = weather_data['main']['temp']
+        country = weather_data['sys']['country']
+        
+        # Temperature data
+        temp = weather_data['main']['temp']
+        feels_like = weather_data['main']['feels_like']
+        temp_min = weather_data['main']['temp_min']
+        temp_max = weather_data['main']['temp_max']
+        
+        # Weather condition
         condition = weather_data['weather'][0]['description']
+        main_weather = weather_data['weather'][0]['main']
+        
+        # Atmospheric data
+        pressure = weather_data['main']['pressure']
+        humidity = weather_data['main']['humidity']
+        
+        # Wind data
+        wind_speed = weather_data['wind']['speed']
+        wind_deg = weather_data['wind'].get('deg', 'N/A')
+        
+        # Visibility
+        visibility = weather_data.get('visibility', 'N/A')
+        if visibility != 'N/A':
+            visibility = visibility / 1000  # Convert to km
+        
+        # Cloudiness
+        cloudiness = weather_data['clouds']['all']
+        
+        # Sunrise and sunset
+        from datetime import datetime
+        sunrise = datetime.fromtimestamp(weather_data['sys']['sunrise']).strftime('%H:%M:%S')
+        sunset = datetime.fromtimestamp(weather_data['sys']['sunset']).strftime('%H:%M:%S')
+        
+        # Coordinates
+        lon = weather_data['coord']['lon']
+        lat = weather_data['coord']['lat']
 
-        print(f"\nWeather in {city_name}")
-        print(f"Temperature: {temperature}°C")
-        print(f"Condition: {condition}")
+        # Display all weather data
+        print(f"\n{'='*50}")
+        print(f"Weather Report for {city_name}, {country}")
+        print(f"{'='*50}")
+        
+        print(f"\n📍 Location:")
+        print(f"   Coordinates: {lat}°N, {lon}°E")
+        
+        print(f"\n🌡️  Temperature:")
+        print(f"   Current: {temp}°C")
+        print(f"   Feels Like: {feels_like}°C")
+        print(f"   Min: {temp_min}°C")
+        print(f"   Max: {temp_max}°C")
+        
+        print(f"\n🌤️  Weather Condition:")
+        print(f"   Main: {main_weather}")
+        print(f"   Description: {condition.capitalize()}")
+        
+        print(f"\n💨 Wind:")
+        print(f"   Speed: {wind_speed} m/s")
+        print(f"   Direction: {wind_deg}°")
+        
+        print(f"\n🌫️  Atmospheric Conditions:")
+        print(f"   Pressure: {pressure} hPa")
+        print(f"   Humidity: {humidity}%")
+        print(f"   Cloudiness: {cloudiness}%")
+        print(f"   Visibility: {visibility} km" if visibility != 'N/A' else f"   Visibility: {visibility}")
+        
+        print(f"\n🌅 Sun:")
+        print(f"   Sunrise: {sunrise}")
+        print(f"   Sunset: {sunset}")
+        
+        print(f"\n{'='*50}\n")
 
     except requests.exceptions.HTTPError as http_err:
         if fetched_data.status_code == 404:
@@ -39,7 +98,6 @@ def get_weather(city):
             print(f"HTTP error: {http_err}")
     except requests.exceptions.ConnectionError:
         print("Error: Connection failed. Check your internet.")
-    # catch-all other exceptions if any occurs
     except Exception as err:
         print(f"Error: {err}")
 
